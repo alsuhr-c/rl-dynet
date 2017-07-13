@@ -1,62 +1,24 @@
-import copy
 import random
 
-WORLD_SIZE = 10
-OBS_PROB = 0.15
+MAX_NUM_ITEMS = 5
 
-def print_world(world, current_pos, goal_pos):
- print(" " + "".join([str(i) for i in range(WORLD_SIZE)]))
- for y in range(WORLD_SIZE):
-   row = str(y)
-   for x in range(WORLD_SIZE):
-     if world[x][y]:
-       if goal_pos == (x, y):
-         if current_pos == goal_pos:
-           row += "*"
-         else:
-           row += "G"
-       elif current_pos == (x, y):
-         row += "S"
-       else:
-         row += " "
-     else:
-       row += "X"
-   print(row)
+possible_items = { "PENNY": 1,
+                   "NICKEL": 5,
+                   "DIME": 10,
+                   "QUARTER": 25 }
 
-def possible_actions(world, current_pos):
-  current_x, current_y = current_pos
-  actions = [ ] 
-
-  # Left
-  if current_x > 1 and world[current_x - 1][current_y]: 
-    actions.append(0)
-  # Right
-  if current_x < WORLD_SIZE - 2 and world[current_x + 1][current_y]:
-    actions.append(1)
-  # Up
-  if current_y > 1 and world[current_x][current_y - 1]:
-    actions.append(2)
-  # Down
-  if current_y < WORLD_SIZE - 2 and world[current_x][current_y + 1]:
-    actions.append(3)
-
-  # Terminate
-  actions.append(4)
-
-  return actions 
-
-class Environment():
+### In a ScalesEnvironment, the agent should choose objects to place on the
+### scale at each step. The agent is given a set of scales where one side is
+### filled with items already, and the agent can place items on the other side
+### of the scale, which is initially empty. 
+class ScalesEnvironment():
   def __init__(self):
-    self.world = [ [ False for _ in range(WORLD_SIZE) ] for __ in range(WORLD_SIZE)]
-    empty_pos = [ ]
+    full_side = [ ]
+    full_weight = 0
+    num_items = randomm.randint(0, MAX_NUM_ITEMS)
+    for item in range(num_items):
+      item_type = random.choice(possible_items.keys())
+      full_side.append(item_type)
+      full_weight += possible_items[item_type]
 
-    for x in range(WORLD_SIZE):
-      for y in range(WORLD_SIZE):
-        no_obs = random.random() > OBS_PROB
-        self.world[x][y] = no_obs
-
-        if no_obs:
-          empty_pos.append((x, y))
-
-    self.goal_pos = random.choice(empty_pos)
-    self.start_pos = random.choice(empty_pos)
+    empty_side = [ ]
