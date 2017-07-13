@@ -1,12 +1,12 @@
 import dynet as dy
 import environment as env
 
-MAX_NUM_EPISODES = 50
+MAX_NUM_EPISODES = 1500
 MAX_NUM_STEPS = 50
 
 GAMMA = 0.999
 
-model = env.Model()
+model = env.ScalesModel()
 
 episode_num = 0
 total_step_num = 0
@@ -22,22 +22,32 @@ def optimize(model, prev_state, current_state, action, reward):
 
   model.trainer.update()
 
+avg_reward = 0
 while episode_num < MAX_NUM_EPISODES:
-  environment = env.Environment()
   step_num = 0
+  environment = env.ScalesEnvironment()
+
+  reward = 1.
 
   while not (environment.has_finished() or step_num > MAX_NUM_STEPS):
-    action = model.select_action(environment, total_step_num)
+    action = model.select_action(environment.current_state(), total_step_num)
 
     environment.take_action(action)
 
     reward = environment.reward()
 
     optimize(model,
-             environment.previous_state,
-             environment,
+             environment.previous_state(),
+             environment.current_state(),
              action,
              reward)
 
     total_step_num += 1
     step_num += 1
+  episode_num += 1
+
+  avg_reward += reward
+
+  if episode_num % 100 == 0:
+    print(avg_reward / 100)
+    avg_reward = 0

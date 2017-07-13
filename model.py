@@ -6,7 +6,7 @@ import random
 
 BLOCK_EMB_SIZE = 2
 
-MAX_NUM_STEPS = 250
+MAX_NUM_STEPS = 50
 MAX_NUM_EPISODES = 20
 
 EPS_START = 0.9
@@ -41,7 +41,7 @@ class Model():
     self.l3_biases = self.model.add_parameters((int(tot_size / 8)))
 
     self.final_layer = self.model.add_parameters((int(tot_size / 8),
-                                                  5))
+                                                  4))
     self.trainer = dy.AdamTrainer(self.model)
 
   def forward(self, environment, current_pos):
@@ -105,14 +105,13 @@ model = Model()
 
 episode_num = 0
 total_step_num = 0
+environment = env.Environment()
 while episode_num < MAX_NUM_EPISODES:
-  environment = env.Environment()
 
   step_num = 0
   current_pos = environment.start_pos
   has_finished = False
   while not (has_finished or step_num > MAX_NUM_STEPS):
-#    env.print_world(environment.world, current_pos, environment.goal_pos)
     action = model.select_action(environment, total_step_num, current_pos)
     x, y = current_pos
 
@@ -126,7 +125,10 @@ while episode_num < MAX_NUM_EPISODES:
       current_pos = (x, y - 1)
     elif action == 3:
       current_pos = (x, y + 1)
-    elif action == 4:
+#    elif action == 4:
+#      has_finished = True
+
+    if current_pos == environment.goal_pos:
       has_finished = True
 
     # Inverse Manhattan distance to goal
@@ -137,14 +139,18 @@ while episode_num < MAX_NUM_EPISODES:
     max_distance = 2 * env.WORLD_SIZE
 
     manh_dist = float(distance_x + distance_y) / max_distance
-    reward = manh_dist
+#    reward = manh_dist
+
+    reward = 0
+    if current_pos == environment.goal_pos:
+      reward = 1
 
     # Also give a penalty if we've terminated but haven't reached the goal
 #    if current_pos != environment.goal_pos and has_finished:
 #      reward -= 1.
 
     # Give a penalty for being slow.
-#    reward -= float(step_num) / MAX_NUM_STEPS 
+    reward -= step_num * 0.02 
 
     model.optimize(environment, prev_pos, action, current_pos, reward) 
 
