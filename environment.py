@@ -48,12 +48,16 @@ class ScalesEnvironment():
     self.empty_weight += possible_items[action_name]
 
   def reward(self):
-    if self.empty_weight <= self.full_weight:
-      return float(self.empty_weight) / self.full_weight
-    elif self.empty_weight <= 2 * self.full_weight:
-      return float(self.empty_weight - self.full_weight) / self.full_weight
+    if self.empty_weight == self.full_weight:
+      return 1.
     else:
       return 0.
+#    if self.empty_weight <= self.full_weight:
+#      return float(self.empty_weight) / self.full_weight
+#    elif self.empty_weight <= 2 * self.full_weight:
+#      return float(self.empty_weight - self.full_weight) / self.full_weight
+#    else:
+#      return 0.
 
   def previous_state(self):
     return self.full_side, self.prev_empty_side

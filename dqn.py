@@ -1,7 +1,7 @@
 import dynet as dy
 import environment as env
 
-MAX_NUM_EPISODES = 1500
+MAX_NUM_EPISODES = 10000
 MAX_NUM_STEPS = 50
 
 GAMMA = 0.999
