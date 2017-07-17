@@ -1,17 +1,18 @@
 import dynet as dy
-import environment as env
+import repeater_environment as env
 
 MAX_NUM_EPISODES = 10000
 MAX_NUM_STEPS = 50
 
 GAMMA = 0.999
 
-model = env.ScalesModel()
+model = env.RepeaterModel()
 
 episode_num = 0
 total_step_num = 0
 
 def optimize(model, prev_state, current_state, action, reward):
+  dy.renew_cg()
   q = dy.pick(model.forward(prev_state), action)
   v = dy.max_dim(model.forward(current_state))
 
@@ -25,7 +26,7 @@ def optimize(model, prev_state, current_state, action, reward):
 avg_reward = 0
 while episode_num < MAX_NUM_EPISODES:
   step_num = 0
-  environment = env.ScalesEnvironment()
+  environment = env.RepeaterEnvironment()
 
   reward = 1.
 
@@ -45,6 +46,7 @@ while episode_num < MAX_NUM_EPISODES:
     total_step_num += 1
     step_num += 1
   episode_num += 1
+  print("predicted string: " + "".join(environment.my_string) + "\t" + str(reward))
 
   avg_reward += reward
 
