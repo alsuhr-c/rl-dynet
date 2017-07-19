@@ -5,14 +5,15 @@ import numpy as np
 import random
 
 EPS_START = 0.9
-EPS_END = 0.05
+EPS_END = 0.30
 EPS_DECAY = 10000
 
 words = open("names.txt").read().strip().split()
 
 class RepeaterEnvironment():
   def __init__(self):
-    self.reference_string = random.choice(words)
+#    self.reference_string = random.choice(words)
+    self.reference_string = str(chr(random.randint(0,3) + 97))
     print("reference string: " + self.reference_string)
 
     self.my_string = [ ]
@@ -52,7 +53,9 @@ class RepeaterEnvironment():
       f1 = 2 * (prec * rec) / (prec + rec)
 
     if len(self.my_string) > len(self.reference_string):
-      f1 -= 1
+      f1 -= 5
+    if self.my_string == self.reference_string:
+      f1 += 10
 
     return f1
 
@@ -79,7 +82,7 @@ class RepeaterModel():
 
     self.empty_state = self.model.add_parameters((20))
 
-    self.trainer = dy.AdamTrainer(self.model, alpha = 0.001)
+    self.trainer = dy.AdamTrainer(self.model, alpha = 0.01)
 
   def forward(self, state):
     ref_str = state[0]

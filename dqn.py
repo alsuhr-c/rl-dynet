@@ -1,12 +1,12 @@
 import dynet as dy
-import repeater_environment as env
+import cart_environment as env
 
-MAX_NUM_EPISODES = 10000
-MAX_NUM_STEPS = 50
+MAX_NUM_EPISODES = 100000
+MAX_NUM_STEPS = 20
 
 GAMMA = 0.999
 
-model = env.RepeaterModel()
+model = env.CartModel()
 
 episode_num = 0
 total_step_num = 0
@@ -26,7 +26,7 @@ def optimize(model, prev_state, current_state, action, reward):
 avg_reward = 0
 while episode_num < MAX_NUM_EPISODES:
   step_num = 0
-  environment = env.RepeaterEnvironment()
+  environment = env.CartEnvironment()
 
   reward = 1.
 
@@ -46,7 +46,6 @@ while episode_num < MAX_NUM_EPISODES:
     total_step_num += 1
     step_num += 1
   episode_num += 1
-  print("predicted string: " + "".join(environment.my_string) + "\t" + str(reward))
 
   avg_reward += reward
 
