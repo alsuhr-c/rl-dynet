@@ -48,16 +48,16 @@ class ScalesEnvironment():
     self.empty_weight += possible_items[action_name]
 
   def reward(self):
-    if self.empty_weight == self.full_weight:
-      return 1.
-    else:
-      return 0.
-#    if self.empty_weight <= self.full_weight:
-#      return float(self.empty_weight) / self.full_weight
-#    elif self.empty_weight <= 2 * self.full_weight:
-#      return float(self.empty_weight - self.full_weight) / self.full_weight
+#    if self.empty_weight == self.full_weight:
+#      return 1.
 #    else:
 #      return 0.
+    if self.empty_weight <= self.full_weight:
+      return float(self.empty_weight) / self.full_weight
+    elif self.empty_weight <= 2 * self.full_weight:
+      return float(self.empty_weight - self.full_weight) / self.full_weight
+    else:
+      return 0.
 
   def previous_state(self):
     return self.full_side, self.prev_empty_side
@@ -71,14 +71,12 @@ class ScalesModel():
 
     # architecture: l1 embeddings for the full and current scales, and l2
     # combines the two and puts biases to transform to decision
-    self.empty_state = self.model.add_parameters((len(possible_items)))
+    self.empty_state = self.model.add_parameters((1))
 
-    self.l1_weights = self.model.add_lookup_parameters((len(possible_items),
-                                                        len(possible_items)))
-    self.l2_weights = self.model.add_parameters((len(possible_items) * 2,
-                                                 len(possible_items)))
+    self.l1_weights = self.model.add_lookup_parameters((len(possible_items), 1))
+    self.l2_weights = self.model.add_parameters((2, len(possible_items)))
 
-    self.trainer = dy.AdamTrainer(self.model)
+    self.trainer = dy.AdamTrainer(self.model, alpha = 0.01)
 
   def forward(self, state):
     full_side = state[0]
@@ -96,7 +94,7 @@ class ScalesModel():
 
     cat = dy.concatenate([full_sum, empty_sum])
 
-    result = dy.transpose(dy.reshape(cat, (1, len(possible_items) * 2)) * dy.parameter(self.l2_weights))
+    result = dy.transpose(dy.rectify(dy.reshape(cat, (1, 2)) * dy.parameter(self.l2_weights)))
     
     return result
 

@@ -6,7 +6,7 @@ import random
 
 EPS_START = 0.9
 EPS_END = 0.05
-EPS_DECAY = 10000
+EPS_DECAY = 200
 
 class CartEnvironment():
   def __init__(self):
@@ -15,16 +15,18 @@ class CartEnvironment():
     self.prev_obs = None
     self.done = False
     self.r = 0
+    self.num_steps = 0
 
   def has_finished(self):
     return self.done
 
   def take_action(self, action):
+    self.num_steps += 1
     self.prev_obs = self.obs
     self.obs, self.r, self.done, info = self.env.step(action)
 
   def reward(self):
-    return self.r
+    return self.r #int(not self.done)
 
   def previous_state(self):
     return self.prev_obs
@@ -39,18 +41,16 @@ class CartModel():
     self.w_1 = self.model.add_parameters((4, 4))
     self.b_1 = self.model.add_parameters((4))
     self.w_2 = self.model.add_parameters((4, 2))
-    self.b_2 = self.model.add_parameters((2))
 
     self.trainer = dy.AdamTrainer(self.model, alpha = 0.001)
 
   def forward(self, state):
     # State should be a length-four matrix
-    l1 = dy.rectify(dy.reshape(dy.inputTensor(state),
+    l1 =dy.reshape(dy.inputTensor(state),
                                (1,
                                 4)) * dy.parameter(self.w_1) + dy.reshape(dy.parameter(self.b_1),
-                                                                          (1, 4)))
-    l2 = dy.rectify(l1 * dy.parameter(self.w_2) + dy.reshape(dy.parameter(self.b_2),
-                                                             (1, 2)))
+                                                                          (1, 4))
+    l2 = l1 * dy.parameter(self.w_2)
     
     return dy.transpose(l2)
 
@@ -61,6 +61,8 @@ class CartModel():
     if sample > threshold:
       dy.renew_cg()
       dist = self.forward(state).npvalue()
+#      print(dist)
+#      print(np.argmax(dist))
       return np.argmax(dist)
     else:
       return random.randint(0, 1)
