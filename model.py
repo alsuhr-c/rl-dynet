@@ -31,17 +31,24 @@ class Model():
     tot_size = BLOCK_EMB_SIZE * self.num_spots
 
     self.l1_weights = self.model.add_parameters((tot_size,
-                                                 int(tot_size / 2)))
-    self.l1_biases = self.model.add_parameters((int(tot_size / 2)))
+                                                 int(tot_size / 2)),
+                                                 initializer = dy.UniformInitializer(0.1))
+    self.l1_biases = self.model.add_parameters((int(tot_size / 2))),
+                                                 initializer = dy.UniformInitializer(0.1)
     self.l2_weights = self.model.add_parameters((int(tot_size / 2),
-                                                 int(tot_size / 4)))
-    self.l2_biases = self.model.add_parameters((int(tot_size / 4)))
+                                                 int(tot_size / 4)),
+                                                 initializer = dy.UniformInitializer(0.1))
+    self.l2_biases = self.model.add_parameters((int(tot_size / 4))),
+                                                 initializer = dy.UniformInitializer(0.1)
     self.l3_weights = self.model.add_parameters((int(tot_size / 4),
-                                                 int(tot_size / 8)))
-    self.l3_biases = self.model.add_parameters((int(tot_size / 8)))
+                                                 int(tot_size / 8))),
+                                                 initializer = dy.UniformInitializer(0.1)
+    self.l3_biases = self.model.add_parameters((int(tot_size / 8))),
+                                                 initializer = dy.UniformInitializer(0.1)
 
     self.final_layer = self.model.add_parameters((int(tot_size / 8),
-                                                  4))
+                                                  4)),
+                                                 initializer = dy.UniformInitializer(0.1)
     self.trainer = dy.AdamTrainer(self.model)
 
   def forward(self, environment, current_pos):
