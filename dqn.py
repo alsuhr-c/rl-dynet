@@ -11,7 +11,6 @@ model = env.CartModel()
 
 episode_num = 0
 total_step_num = 0
-batch_size = 8
 
 def compute_loss(model, prev_state, current_state, action, reward, step_num):
   q = dy.pick(model.forward(prev_state), action)
@@ -49,14 +48,10 @@ while episode_num < MAX_NUM_EPISODES:
 
     batch.append((environment.previous_state(), environment.current_state(), action, reward, total_step_num))
 
-    if len(batch) == batch_size:
-      batch_optimize(model, batch)
-      batch = [ ]
-
     total_step_num += 1
     step_num += 1
 
-#  batch_optimize(model, batch)
+  batch_optimize(model, batch)
 
   episode_num += 1
 
