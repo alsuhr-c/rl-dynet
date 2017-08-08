@@ -61,8 +61,6 @@ class CartModel():
     if sample > threshold:
       dy.renew_cg()
       dist = self.forward(state).npvalue()
-#      print(dist)
-#      print(np.argmax(dist))
       return np.argmax(dist)
     else:
       return random.randint(0, 1)
